@@ -1,0 +1,61 @@
+---
+- name: Assign IP address to Device Interface
+  block:
+
+    - name: Verify if IP address exists
+      uri:
+        url: "{{netbox_url}}/api/ipam/ip-addresses/?address={{device.mgmt_ip}}"
+        method: GET
+        headers:
+          Authorization: "Token {{netbox_token}}"
+          Accept: 'application/json'
+        return_content: yes
+        body_format: json
+        status_code: [200, 201]
+      register: netbox_IPAddress
+      ignore_errors: yes
+
+    # retrieve the correct interface id from the list based on the device name and device' mgmt_intf
+    # store this in the interface_id var
+
+    - name: Retrieve Interface ID
+      set_fact:
+        interface_id: "{{item.id}}"
+      with_items: "{{task_var}}"
+      when:
+        - item.device.name == device.hostname
+        - item.name == device.mgmt_intf
+      run_once: yes
+      tags: primary
+
+    # assign the IP address to the correct interface_id
+
+    - name: Assign IP addresses
+      uri:
+        url: "{{netbox_url}}/api/ipam/ip-addresses/"
+        method: POST
+        headers:
+          Authorization: "Token {{netbox_token}}"
+          Accept: 'application/json'
+        return_content: yes
+        body_format: json
+        body:
+          address: "{{device.mgmt_ip}}"
+          assigned_object_type: "dcim.interface"
+          assigned_object_id: "{{interface_id}}"
+          description: 'Mgmt IP of {{device.hostname}}'
+          vrf: {"name": "Management"}
+        status_code: [200, 201]
+      register: netbox_IPAddress
+      run_once: yes
+      tags: Assign_IP
+      when: netbox_IPAddress.json.count == 0
+
+# Block ends here
+
+# use this as sanity check when necessary via debug tag
+- name: debug
+  debug:
+    msg: 'the intf id of {{device.hostname}} is {{interface_id}}'
+  tags: debug
+  run_once: yes

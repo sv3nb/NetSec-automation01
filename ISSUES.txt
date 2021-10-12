@@ -1,0 +1,122 @@
+
+Issue: Encountered issues with netbox_interface module in Ansible which gives an API connection error
+Solution: Use URI module instead
+
+Issue: Creating IP address objects works but they do not get linked to the device / interface.
+Solution: Use URI module instead with PATCH (tested in POSTMAN and Ansible)
+Extra remarks: Using a POST to create the IP address object and assign it to an object does not work
+the object is created multiple times without the assigned object.
+Hence this seems to be an API issue and not an Ansible issue.
+
+Issue: Assigning IP addresses to interface IDs works for a subset of devices.
+From a certain point the IP addresses are all assigned to the same device/interface.
+Fixed after first only importing the management interfaces of the devices and then Assigning IP addresses to them.
+Afterwards i imported the ethernet interfaces which kicks up the total count of interfaces.
+
+When doing a GET to retrieve all interfaces with POSTMAN it seems that it counts 108 interfaces but they are not all there in the JSON dictionary.
+Also when testing the API with the Netbox GUI you have to use the "offset=" Parameter since it does not store all the results on one page.
+So we have to be more specific when requesting a list of interfaces if we wish to reference their id in subsequent calls.
+The best way to do this i believe is by setting a DESCRIPTION on the interface when creating it.
+Then we can filter our API calls on description and only retrieve the Management or the Interconnect or the whatever interfaces.
+
+The offset is per 50 which means the API can return 50 entries per call.
+If you expect a longer list your will need to split this over multiple API calls and use the /?offset=50,100,150 etc..
+
+ANSIBLE:
+
+This is the equivalent of creating and assigning the IP address to a device/Interface which does not work!
+However we do not seem to have this issue when we use the assigned_object_id of the interface. (see below)
+
+- name: Assign IP addresses
+  uri:
+    url: "{{netbox_url}}/api/ipam/ip-addresses/"
+    method: POST
+    headers:
+      Authorization: "Token {{netbox_token}}"
+      Accept: 'application/json'
+    return_content: yes
+    body_format: json
+    body:
+      address: "{{device.mgmt_ip}}"
+      assigned_object_type: "dcim.interface"
+      assigned_object: {display: Management1, device: {display: "{{device.hostname}}" } }
+    status_code: [200, 201]
+  register: netbox_IPAddress
+  run_once: yes
+  tags: Assign_IP
+
+
+POSTMAN:
+
+POST: http://192.168.211.133:8000/api/ipam/ip-addresses/
+
+Sending the following json Body however to create and assign the IP address to a device with a POST does WORK!
+Is the clue using the object_id instead of device name / interface name combination?
+
+{
+        "address": "192.168.108.100/24",
+        "assigned_object_type": "dcim.interface",
+        "assigned_object_id": 56
+
+}
+
+The following code also WORKS this requires first creating the object and referencing it by id
+
+- name: Assign IP addresses
+  uri:
+    url: "{{netbox_url}}/api/ipam/ip-addresses/?address=192.168.108.11/24"
+    method: PATCH
+    headers:
+      Authorization: "Token {{netbox_token}}"
+      Accept: 'application/json'
+    return_content: yes
+    body_format: json
+    body:
+      - {"id": 1, "assigned_object_type": "dcim.interface", "assigned_object_id": 51}
+    status_code: [200, 201]
+  register: netbox_IPAddress
+  run_once: yes
+  tags: test
+  ignore_errors: yes
+
+
+The following combination also works which avoids making duplicates when we are looping in Ansible.
+
+- name: Verify if IP addresses exists
+  uri:
+    url: "{{netbox_url}}/api/ipam/ip-addresses/?address=192.168.108.100/24"
+    method: GET
+    headers:
+      Authorization: "Token {{netbox_token}}"
+      Accept: 'application/json'
+    return_content: yes
+    body_format: json
+    status_code: [200, 201]
+  register: netbox_IPAddress
+  run_once: yes
+  tags: Assign_IP
+  ignore_errors: yes
+
+- name: Assign IP addresses
+  uri:
+    url: "{{netbox_url}}/api/ipam/ip-addresses/"
+    method: POST
+    headers:
+      Authorization: "Token {{netbox_token}}"
+      Accept: 'application/json'
+    return_content: yes
+    body_format: json
+    body:
+      address: "192.168.108.100/24"
+      assigned_object_type: "dcim.interface"
+      assigned_object_id: 56
+    status_code: [200, 201]
+  register: netbox_IPAddress
+  run_once: yes
+  tags: Assign_IP
+  when: netbox_IPAddress.json.count == 0
+
+
+  - name: debug
+    debug:
+      var: device_roles | json_query('[*].type') | unique #this extracts a particular value of the dictionary and returns only unique values

@@ -1,0 +1,38 @@
+---
+
+# to assign an IP address to a device we need to reference the relevant interface id
+# we need to filter our API request because it returns max 50 entries per call!
+- name: Retrieve Interfaces and store in JSON
+  uri:
+    url: "{{netbox_url}}/api/dcim/interfaces?description=Management"
+    method: GET
+    headers:
+      Authorization: "Token {{netbox_token}}"
+      Accept: 'application/json'
+    return_content: yes
+    body_format: json
+    status_code: [200, 201]
+  register: interface_json
+  run_once: yes
+  tags: debug, Assign_IP, primary
+  ignore_errors: yes
+
+# pass the device dict and the list of interfaces retrieved from netbox to the included task
+
+- name: Assign Netbox IP Address
+  include_tasks: Assign_IP_Address.yml
+  vars:
+    task_var: "{{interface_json['json']['results']}}"
+  loop: "{{ devices }}"
+  loop_control:
+    loop_var: device
+  run_once: yes
+  tags: Assign_IP, debug
+
+- name: Make IP Primary
+  include_tasks: Make_IP_Primary.yml
+  loop: "{{ devices }}"
+  loop_control:
+    loop_var: device
+  run_once: yes
+  tags: primary

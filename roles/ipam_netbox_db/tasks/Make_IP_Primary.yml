@@ -1,0 +1,51 @@
+---
+- name: Assign Management IP as Primary for Device
+  block:
+     # assign the IP address to the correct interface_id
+
+    - name: Retrieve IP address information
+      uri:
+        url: "{{netbox_url}}/api/ipam/ip-addresses/?address={{device.mgmt_ip}}"
+        method: GET
+        headers:
+          Authorization: "Token {{netbox_token}}"
+          Accept: 'application/json'
+        return_content: yes
+        body_format: json
+        status_code: [200, 201]
+      register: ip_address_json
+
+    - name: Set IP Address and Device ID
+      set_fact:
+        ip_addr_id: '{{ip_address_json["json"]["results"][0]["id"]}}'
+        device_id: '{{ip_address_json["json"]["results"][0]["assigned_object"]["device"]["id"]}}'
+      run_once: yes
+
+    - name: Sanity check
+      debug:
+        msg: '{{ device_id | int }}'
+      run_once: yes
+
+# you need to specify the id of the device and the primary ip:id
+# it seems netbox expects integers but ansible always converts them to strings :(
+# Finally got this working!!! used Ansible v 2.9.25
+
+    - name: Set Assigned IP as Primary IP
+      uri:
+        url: "{{netbox_url}}/api/dcim/devices/?id={{device_id}}"
+        method: PATCH
+        headers:
+          Authorization: "Token {{netbox_token}}"
+          Accept: 'application/json'
+        return_content: yes
+        body_format: json
+        body:
+          '[ {"id": {{device_id | int }}, "primary_ip4": {{ip_addr_id | int }} } ]'
+        status_code: [200, 201]
+      environment:
+        ANSIBLE_JINJA2_NATIVE: true
+  run_once: yes
+  tags: primary
+  ignore_errors: yes
+
+# Block ends here

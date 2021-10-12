@@ -1,0 +1,12 @@
+DCAMS-Spine01,192.168.108.11/24,vEOS_4.7,Arista,Spine,DCAMS,Management1
+DCAMS-Spine02,192.168.108.12/24,vEOS_4.7,Arista,Spine,DCAMS,Management1
+DCAMS-Leaf01,192.168.108.13/24/24,vEOS_4.7,Arista,Leaf,DCAMS,Management1
+DCAMS-Leaf02,192.168.108.dd,vEOS_4.7,Arista,Leaf,DCAMS,Management1
+DCAMS-Edge01,192.168.108.10/24/24,c7200,Cisco,Edge,DCAMS,Fastethernet0/0
+DCAMS-FW01,192.168.108.20/24/24,Fortigate_500E,Fortinet,InternetFW,DCAMS,Port1
+DCBRU-Spine01,192.168.109.11/24,vEOS_4.7,Arista,Spine,DCBRU,Management1
+DCBRU-Spine02,192.168.109.12/24,vEOS_4.7,Arista,Spine,DCBRU,Management1
+DCBRU-Leaf01,192.168.109.13/24,vEOS_4.7,Arista,Leaf,DCBRU,Management1
+DCBRU-Leaf02,192.168.109.14/24,vEOS_4.7,Arista,Leaf,DCBRU,Management1
+DCBRU-Edge01,192.168.109.10/24,c7200,Cisco,Edge,DCBRU,Fastethernet0/0
+DCBRU-FW01,192.168.109.20/24,Fortigate_500E,Fortinet,InternetFW,DCBRU,Port1

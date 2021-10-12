@@ -1,0 +1,21 @@
+---
+
+# This is if the IP address objected already exists PATCH updates an existing objected
+# peculiarity is that we need to enclose the json body in a list with "-" !!
+
+- name: Assign IP addresses
+  uri:
+    url: "{{netbox_url}}/api/ipam/ip-addresses/?address=192.168.108.11/24"
+    method: PATCH
+    headers:
+      Authorization: "Token {{netbox_token}}"
+      Accept: 'application/json'
+    return_content: yes
+    body_format: json
+    body:
+      - {"id": 1, "assigned_object_type": "dcim.interface", "assigned_object_id": 51}
+    status_code: [200, 201]
+  register: netbox_IPAddress
+  run_once: yes
+  tags: test
+  ignore_errors: yes

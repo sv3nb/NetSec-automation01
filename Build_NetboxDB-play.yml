@@ -1,0 +1,12 @@
+---
+
+- name: PLAY 00 - Build netbox Database
+  connection: local
+  hosts: localhost
+  gather_facts: False
+  collections:
+    - netbox.netbox
+
+  tasks:
+    - import_role:
+        name: build_netbox_db
