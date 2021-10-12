@@ -5,9 +5,12 @@ import csv
 import yaml
 from contextlib import redirect_stdout
 import os
+from shutil import copyfile
+from create_device_types import Create_Device_Types
 
-source1 = "csv_export/device_roles_02.csv"
-source2 = "csv_export/devices_02.csv"
+roles = "csv_export/device_roles_02.csv"
+devices = "csv_export/devices_02.csv"
+main_yml = "roles/build_netbox_db/vars/main.yml"
 
 def CSV_Yaml_Converter(file):
     '''Converts a CSV to a yaml file. It counts the number of columns using the fieldnames property
@@ -42,14 +45,22 @@ if __name__ == '__main__':
 
     os.chdir('..') # change to parent directory "netbox" so we can use relative paths
     # open a new yml file to write output to
-    with open('roles/build_netbox_db/vars/main.yml', 'w') as file1:
-        file1.write("---\n") # start of yaml file
-        file1.write("device_roles:\n")
-        with redirect_stdout(file1):
-            CSV_Yaml_Converter(source1)
+    with open('roles/build_netbox_db/vars/main.yml', 'w') as output_file:
+        output_file.write("---\n") # start of yaml file
+        output_file.write("device_roles:\n")
+        with redirect_stdout(output_file):
+            CSV_Yaml_Converter(roles)
 
     # append second output to yml file
-    with open('roles/build_netbox_db/vars/main.yml', 'a') as file1:
-        file1.write("devices:\n")
-        with redirect_stdout(file1):
-            CSV_Yaml_Converter(source2)
+    with open('roles/build_netbox_db/vars/main.yml', 'a') as output_file:
+        output_file.write("devices:\n")
+        with redirect_stdout(output_file):
+            CSV_Yaml_Converter(devices)
+
+    # call function from create_device_types.py
+    with open('roles/build_netbox_db/vars/main.yml', 'a') as output_file:
+        with redirect_stdout(output_file):
+            Create_Device_Types(main_yml)
+
+    # Here you copy this file to other roles that need it
+    copyfile('roles/build_netbox_db/vars/main.yml', 'roles/ipam_netbox_db/vars/main.yml')

@@ -1,0 +1,114 @@
+---
+device_roles:
+  - role: Edge
+    type: c7200
+    vendor: Cisco
+  - role: Spine
+    type: vEOS_4.7
+    vendor: Arista
+  - role: Leaf
+    type: vEOS_4.7
+    vendor: Arista
+  - role: Firewall
+    type: Fortigate_81E
+    vendor: Fortinet
+  - role: Distribution
+    type: c7200
+    vendor: Cisco
+  - role: Core
+    type: c7200
+    vendor: Cisco
+  - role: Access
+    type: vEOS_4.7
+    vendor: Arista
+  - role: InternetFW
+    type: Fortigate_500E
+    vendor: Fortinet
+  - role: IOT_Gateway
+    type: vyos_router
+    vendor: Vyos
+devices:
+  - hostname: DCAMS-Spine01
+    mgmt_ip: 192.168.108.11/24
+    type: vEOS_4.7
+    vendor: Arista
+    role: Spine
+    location: DCAMS
+    mgmt_intf: Management1
+  - hostname: DCAMS-Spine02
+    mgmt_ip: 192.168.108.12/24
+    type: vEOS_4.7
+    vendor: Arista
+    role: Spine
+    location: DCAMS
+    mgmt_intf: Management1
+  - hostname: DCAMS-Leaf01
+    mgmt_ip: 192.168.108.13/24
+    type: vEOS_4.7
+    vendor: Arista
+    role: Leaf
+    location: DCAMS
+    mgmt_intf: Management1
+  - hostname: DCAMS-Leaf02
+    mgmt_ip: 192.168.108.14/24
+    type: vEOS_4.7
+    vendor: Arista
+    role: Leaf
+    location: DCAMS
+    mgmt_intf: Management1
+  - hostname: DCAMS-Edge01
+    mgmt_ip: 192.168.108.10/24
+    type: c7200
+    vendor: Cisco
+    role: Edge
+    location: DCAMS
+    mgmt_intf: Fastethernet0/0
+  - hostname: DCAMS-FW01
+    mgmt_ip: 192.168.108.20/24
+    type: Fortigate_500E
+    vendor: Fortinet
+    role: InternetFW
+    location: DCAMS
+    mgmt_intf: Port1
+  - hostname: DCBRU-Spine01
+    mgmt_ip: 192.168.109.11/24
+    type: vEOS_4.7
+    vendor: Arista
+    role: Spine
+    location: DCBRU
+    mgmt_intf: Management1
+  - hostname: DCBRU-Spine02
+    mgmt_ip: 192.168.109.12/24
+    type: vEOS_4.7
+    vendor: Arista
+    role: Spine
+    location: DCBRU
+    mgmt_intf: Management1
+  - hostname: DCBRU-Leaf01
+    mgmt_ip: 192.168.109.13/24
+    type: vEOS_4.7
+    vendor: Arista
+    role: Leaf
+    location: DCBRU
+    mgmt_intf: Management1
+  - hostname: DCBRU-Leaf02
+    mgmt_ip: 192.168.109.14/24
+    type: vEOS_4.7
+    vendor: Arista
+    role: Leaf
+    location: DCBRU
+    mgmt_intf: Management1
+  - hostname: DCBRU-Edge01
+    mgmt_ip: 192.168.109.10/24
+    type: c7200
+    vendor: Cisco
+    role: Edge
+    location: DCBRU
+    mgmt_intf: Fastethernet0/0
+  - hostname: DCBRU-FW01
+    mgmt_ip: 192.168.109.20/24
+    type: Fortigate_500E
+    vendor: Fortinet
+    role: InternetFW
+    location: DCBRU
+    mgmt_intf: Port1
