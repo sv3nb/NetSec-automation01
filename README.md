@@ -11,3 +11,6 @@
  Subsequent additions of sites, devices, vlans, etc in Netbox can be synced with  Ansible for automatic deployment of network services
 
  I am using Ansible 2.9.25 for the playbooks.
+ Docker version of Netbox 1.4.0 see https://hub.docker.com/r/netboxcommunity/netbox for more.
+ The Netboxcommunity version 3.0.7 (API is v3.0)
+ 
