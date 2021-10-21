@@ -1,0 +1,32 @@
+---
+
+- name: Retrieve Device Roles
+  uri:
+    url: "{{netbox_url}}/api/dcim/device-roles/?role={{role}}"
+    method: GET
+    headers:
+      Authorization: "Token {{netbox_token}}"
+      Accept: 'application/json'
+    return_content: yes
+    body_format: json
+    status_code: [200, 201]
+  register: netbox_device_role
+  run_once: yes
+  tags: device_roles
+
+- name: Create Device Roles
+  uri:
+    url: "{{netbox_url}}/api/dcim/device-roles/"
+    method: POST
+    headers:
+      Authorization: "Token {{netbox_token}}"
+      Accept: 'application/json'
+    return_content: yes
+    body_format: json
+    body:
+      name: "{{role}}"
+      slug: "{{role | lower}}"
+    status_code: [200, 201]
+  run_once: yes
+  tags: device_roles
+  ignore_errors: yes

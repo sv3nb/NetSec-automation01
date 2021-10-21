@@ -1,0 +1,15 @@
+site,network,vlan,vrf,description
+DCAMS,10.10.1.0/24,101,default,web-servers
+DCAMS,10.10.2.0/24,102,default,db-servers
+DCAMS,10.10.3.0/24,103,default,microservices
+DCAMS,10.10.4.0/24,104,default,net-storage
+DCAMS,10.10.5.0/24,105,internal,internal-services
+DCAMS,10.10.6.0/24,106,default,unassigned
+DCAMS,10.10.7.0/24,107,default,unassigned
+DCBRU,10.20.1.0/24,201,default,web-servers
+DCBRU,10.20.2.0/24,201,default,db-servers
+DCBRU,10.20.3.0/24,201,default,microservices
+DCBRU,10.20.4.0/24,201,default,net-storage
+DCBRU,10.20.5.0/24,201,internal,internal-services
+DCBRU,10.20.6.0/24,201,default,unassigned
+DCBRU,10.20.7.0/24,201,default,unassigned

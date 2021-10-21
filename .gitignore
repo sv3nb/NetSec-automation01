@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# this file contains sensitive data and is excluded
+group_vars/all.yml

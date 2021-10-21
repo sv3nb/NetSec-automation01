@@ -1,0 +1,34 @@
+---
+
+- name: Retrieve Existing Device Vendors
+  uri:
+    url: "{{netbox_url}}/api/dcim/manufacturers/?name={{manufacturer}}"
+    method: GET
+    headers:
+      Authorization: "Token {{netbox_token}}"
+      Accept: 'application/json'
+    return_content: yes
+    body_format: json
+    status_code: [200, 201]
+  register: netbox_vendors
+  run_once: yes
+  tags: retrieve_vendors, create_vendors
+
+- name: Create Device Vendors
+  uri:
+    url: "{{netbox_url}}/api/dcim/manufacturers/"
+    method: POST
+    headers:
+      Authorization: "Token {{netbox_token}}"
+      Accept: 'application/json'
+    return_content: yes
+    body_format: json
+    body:
+      name: "{{manufacturer}}"
+      slug: "{{manufacturer | lower}}"
+    status_code: [200, 201]
+  run_once: yes
+  when:
+    - netbox_vendors.json.count == 0
+    - netbox_state =='present'
+  tags: create_vendors

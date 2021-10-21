@@ -1,0 +1,58 @@
+---
+
+- name: Create Netbox sites
+  netbox.netbox.netbox_site:
+    netbox_token: "{{netbox_token}}"
+    netbox_url: "{{netbox_url}}"
+    data:
+      name: "{{item.name | lower}}"
+      description: "{{item.description | default(omit)}}"
+      physical_address: "{{item.location | default(omit)}}"
+    state: "{{netbox_state}}"
+  loop: "{{sites}}"
+  run_once: yes
+  tags: netbox_sites
+
+- name: Create Netbox Vendors
+  include_tasks: create_vendors.yml
+  loop: "{{ device_roles | map(attribute='vendor') | list | unique }}"
+  loop_control:
+    loop_var: manufacturer # instead of 'item' we use this value to reference each list item.
+  run_once: yes
+  tags: create_vendors, retrieve_vendors
+
+- name: Create Netbox Roles
+  include_tasks: create_device_roles.yml
+  loop: "{{ device_roles | map(attribute='role') | list | unique }}"
+  loop_control:
+    loop_var: role
+  run_once: yes
+  tags: device_roles
+
+- name: debug
+  debug:
+    var: device_roles | json_query('[*].type') | unique #this extracts a particular value of the dictionary and returns only unique values
+
+- name: Create Netbox Types
+  include_tasks: create_device_types.yml
+  loop: "{{ device_types }}"
+  loop_control:
+    loop_var: model
+  run_once: yes
+  tags: device_types
+
+- name: Create Netbox Devices
+  include_tasks: create_devices.yml
+  loop: "{{ devices }}"
+  loop_control:
+    loop_var: device
+  run_once: yes
+  tags: create_devices
+
+- name: Create Netbox Interfaces
+  include_tasks: create_interfaces.yml
+  loop: "{{ devices }}"
+  loop_control:
+    loop_var: device
+  run_once: yes
+  tags: netbox_interfaces, Ethernet

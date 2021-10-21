@@ -1,0 +1,12 @@
+---
+# this one is currently not used see Assign_IP_Address.yml instead
+
+- name: Add MGMT IPs
+  netbox.netbox.netbox_ip_address:
+    data:
+      address: "{{ device.mgmt_ip }}"
+      vrf: {name: Management}
+    netbox_token: "{{ netbox_token }}"
+    netbox_url: "{{ netbox_url }}"
+    state: "{{ netbox_state }}"
+  tags: notused

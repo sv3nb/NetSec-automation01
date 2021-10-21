@@ -1,0 +1,48 @@
+---
+
+# Use this to create the management interfaces which need to be mentioned in the main.yaml var file
+# These will have an IP address assigned to them later on
+
+- name: Create Management Interfaces
+  block:
+    - name: Mgmt interfaces
+      uri:
+        url: "{{netbox_url}}/api/dcim/interfaces/"
+        method: POST
+        headers:
+          Authorization: "Token {{netbox_token}}"
+          Accept: 'application/json'
+        return_content: yes
+        body_format: json
+        body:
+          device: {name: "{{device.hostname}}"}
+          name: "{{device.mgmt_intf}}"
+          type: other
+          mgmt_only: true
+          description: Management
+        status_code: [200, 201]
+  run_once: yes
+  tags: netbox_interfaces
+  ignore_errors: true
+
+# Create these after assigning IP addresses to the Management interfaces
+# Or else the JSON dict cannot hold all the device ids (see the main.yml task of the ipam_netbox role)
+- name: Create Ethernet Interfaces
+  uri:
+    url: "{{netbox_url}}/api/dcim/interfaces/"
+    method: POST
+    headers:
+      Authorization: "Token {{netbox_token}}"
+      Accept: 'application/json'
+    return_content: yes
+    body_format: json
+    body:
+      device: {name: "{{device.hostname}}"}
+      name: "Ethernet{{item}}"
+      type: other
+      description: L2 Interface
+    status_code: [200, 201]
+  run_once: yes
+  with_sequence: start=1 end=12
+  when: device.vendor == "Arista"
+  tags: netbox_interfaces

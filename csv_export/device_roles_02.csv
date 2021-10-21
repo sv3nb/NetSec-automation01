@@ -1,0 +1,10 @@
+role,type,vendor
+Edge,c7200,Cisco
+Spine,"vEOS_4.7",Arista
+Leaf,"vEOS_4.7",Arista
+Firewall,Fortigate_81E,Fortinet
+Distribution,c7200,Cisco
+Core,c7200,Cisco
+Access,"vEOS_4.7",Arista
+InternetFW,Fortigate_500E,Fortinet
+IOT_Gateway,vyos_router,Vyos

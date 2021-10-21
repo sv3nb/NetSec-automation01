@@ -1,0 +1,14 @@
+---
+
+- name: Create Devices
+  netbox.netbox.netbox_device:
+    data:
+      name: "{{ device.hostname }}"
+      device_role: "{{ device.role }}"
+      device_type: "{{ device.type | lower | regex_replace('[.]','_')}}" # we changed vEOS_4.7 to vEOS_4_7 in the other tasks
+      status: Active
+      site: "{{ device.location }}"
+    netbox_token: "{{ netbox_token }}"
+    netbox_url: "{{ netbox_url }}"
+    state: "{{ netbox_state }}"
+  tags: create_devices
